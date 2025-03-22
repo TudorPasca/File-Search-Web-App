@@ -1,0 +1,27 @@
+<div class="search-container">
+    <input type="text" [(ngModel)]="searchQuery" placeholder="Enter search query" />
+    <button (click)="onSearch()">Search</button>
+</div>
+
+<div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+</div>
+
+<table *ngIf="files.length > 0" class="file-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Path</th>
+            <th>Content</th>
+            <th>Is Folder</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let file of files">
+            <td>{{ file.name }}</td>
+            <td>{{ file.path }}</td>
+            <td>{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content }}</td>
+            <td>{{ file.is_folder ? 'Yes' : 'No' }}</td>
+        </tr>
+    </tbody>
+</table>
