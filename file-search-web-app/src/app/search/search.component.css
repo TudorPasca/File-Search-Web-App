@@ -1,3 +1,9 @@
+.action-containers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .file-table {
     width: 100%;
     border-collapse: collapse;

@@ -1,10 +1,17 @@
-<div class="search-container">
-    <input type="text" [(ngModel)]="searchQuery" placeholder="Enter search query" />
-    <button (click)="onSearch()">Search</button>
+<div class="action-containers">
+    <div class="search-container">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Enter search query" />
+        <button (click)="onSearch()">Search</button>
+    </div>
+    
+    <div class="index-container">
+        <input type="text" [(ngModel)]="pathToIndex" placeholder="Enter path to index" />
+        <button (click)="onIndexFiles()">Start Indexing</button>
+    </div>
 </div>
 
-<div *ngIf="errorMessage" class="error">
-    {{ errorMessage }}
+<div *ngIf="userMessage" class="error">
+    {{ userMessage }}
 </div>
 
 <table *ngIf="files.length > 0" class="file-table">

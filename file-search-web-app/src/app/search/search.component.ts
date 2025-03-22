@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FileDTO, SearchService } from '../search.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { IndexService } from '../index.service';
 
 @Component({
   selector: 'app-search',
@@ -11,33 +12,50 @@ import { CommonModule } from '@angular/common';
 })
 export class SearchComponent {
   searchQuery: string = '';
+  pathToIndex: string = '';
   files: FileDTO[] = [];
-  errorMessage: string = '';
+  userMessage: string = '';
 
-  constructor(private searchService: SearchService) { }
+  constructor(private searchService: SearchService, private indexService: IndexService) { }
 
   onSearch(): void {
     if (!this.searchQuery.trim()) {
-      this.errorMessage = 'Search query cannot be empty.';
+      this.userMessage = 'Search query cannot be empty.';
       this.files = [];
       return;
     }
     
-    this.errorMessage = '';
+    this.userMessage = '';
 
     this.searchService.searchFiles(this.searchQuery).subscribe({
-      next: this.handleUpdateResponse.bind(this),
-      error: this.handleError.bind(this),
+      next: this.handleSearchResponse.bind(this),
+      error: this.handleError.bind(this, "SEARCH"),
     });
   }
 
-  private handleUpdateResponse(data: FileDTO[]): void {
+  private handleSearchResponse(data: FileDTO[]): void {
     this.files = data;
     console.log(this.files);
   }
 
-  private handleError(error: any): void {
-    this.errorMessage = 'An error occurred while searching.';
+  private handleError(error: any, operation: string): void {
+    this.userMessage = 'An error occurred during ' + operation;
     console.error('Search error:', error);
+  }
+
+  onIndexFiles(): void {
+    if (!this.pathToIndex) {
+      this.userMessage = "Please provide a valid path.";
+      return;
+    }
+
+    this.indexService.indexFiles(this.pathToIndex).subscribe({
+      next: this.handleIndexResponse.bind(this),
+      error: this.handleError.bind(this, "INDEX"),
+    });
+  }
+
+  private handleIndexResponse() {
+    this.userMessage = 'Indexing Complete';
   }
 }
