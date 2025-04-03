@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 export interface FileDTO {
-  name: string;
+  filename: string;
   path: string;
-  content: string;
+  contents: string;
   is_folder: boolean;
 }
 
@@ -17,8 +17,8 @@ export class SearchService {
 
   constructor(private http: HttpClient) { }
 
-  searchFiles(query: string): Observable<FileDTO[]> {
-    return this.http.get<{ results: FileDTO[] }>(`${this.apiUrl}?q=${query}`)
+  searchFiles(filter: string): Observable<FileDTO[]> {
+    return this.http.post<{ results: FileDTO[] }>(this.apiUrl, { filter })
       .pipe(map(response => response.results));
   }
 }
