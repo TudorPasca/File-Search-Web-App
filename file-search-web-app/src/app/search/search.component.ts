@@ -16,7 +16,7 @@ export class SearchComponent {
   files: FileDTO[] = [];
   userMessage: string = '';
 
-  constructor(private searchService: SearchService, private indexService: IndexService) { }
+  constructor(private searchService: SearchService) { }
 
   onSearch(): void {
     if (!this.searchQuery.trim()) {
@@ -41,21 +41,5 @@ export class SearchComponent {
   private handleError(error: any, operation: string): void {
     this.userMessage = 'An error occurred during ' + operation;
     console.error('Search error:', error);
-  }
-
-  onIndexFiles(): void {
-    if (!this.pathToIndex) {
-      this.userMessage = "Please provide a valid path.";
-      return;
-    }
-
-    this.indexService.indexFiles(this.pathToIndex).subscribe({
-      next: this.handleIndexResponse.bind(this),
-      error: this.handleError.bind(this, "INDEX"),
-    });
-  }
-
-  private handleIndexResponse() {
-    this.userMessage = 'Indexing Request Complete';
   }
 }

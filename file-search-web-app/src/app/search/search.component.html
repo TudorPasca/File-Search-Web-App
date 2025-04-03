@@ -3,11 +3,6 @@
         <input type="text" [(ngModel)]="searchQuery" placeholder="Enter search query" />
         <button (click)="onSearch()">Search</button>
     </div>
-    
-    <div class="index-container">
-        <input type="text" [(ngModel)]="pathToIndex" placeholder="Enter path to index" />
-        <button (click)="onIndexFiles()">Start Indexing</button>
-    </div>
 </div>
 
 <div *ngIf="userMessage" class="error">
@@ -25,9 +20,9 @@
     </thead>
     <tbody>
         <tr *ngFor="let file of files">
-            <td>{{ file.name }}</td>
+            <td>{{ file.filename }}</td>
             <td>{{ file.path }}</td>
-            <td>{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content }}</td>
+            <td>{{ file.contents.length > 30 ? (file.contents | slice:0:30) + '...' : file.contents }}</td>
             <td>{{ file.is_folder ? 'Yes' : 'No' }}</td>
         </tr>
     </tbody>
