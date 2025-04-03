@@ -56,6 +56,6 @@ export class SearchComponent {
   }
 
   private handleIndexResponse() {
-    this.userMessage = 'Indexing Complete';
+    this.userMessage = 'Indexing Request Complete';
   }
 }
