@@ -7,6 +7,7 @@ export interface FileDTO {
   path: string;
   content: string;
   is_folder: boolean;
+  score: number;
 }
 
 @Injectable({

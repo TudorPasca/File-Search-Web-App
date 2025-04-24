@@ -10,9 +10,19 @@
     </div>
 </div>
 
-<div *ngIf="userMessage" class="error">
-    {{ userMessage }}
+<div *ngIf="userMessage" class="error"> {{ userMessage }}
 </div>
+
+<div *ngIf="suggestions && suggestions.length > 0;else no_suggestions" class="suggestions-box">
+    <h3>Search Suggestions</h3>
+    <ul>
+        <li *ngFor="let suggestion of suggestions">{{ suggestion }}</li>
+    </ul>
+</div>
+
+<ng-template #no_suggestions>
+    <h3>No Suggestions</h3>
+</ng-template>
 
 <table *ngIf="files.length > 0" class="file-table">
     <thead>
@@ -20,15 +30,20 @@
             <th>Name</th>
             <th>Path</th>
             <th>Content</th>
-            <th>Is Folder</th>
+            <th>Relevance Score</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let file of files">
             <td>{{ file.name }}</td>
             <td>{{ file.path }}</td>
-            <td>{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content }}</td>
-            <td>{{ file.is_folder ? 'Yes' : 'No' }}</td>
+            <td [title]="file.content">{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content }}</td>
+            <td>{{ file.score }}</td>
+            <!-- <td>{{ file.is_folder ? 'Yes' : 'No' }}</td> -->
         </tr>
     </tbody>
 </table>
+
+<div *ngIf="files.length === 0 && !userMessage && searchQuery && searchQuery.trim().length > 0">
+    <p>No files found matching your query.</p>
+</div>
