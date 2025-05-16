@@ -28,3 +28,15 @@
 .file-table tr:hover {
     background-color: #f1f1f1;
 }
+
+.widgets-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 15px;
+}
+
+.widgets-container > * {
+    flex-grow: 1;
+    flex-basis: 0;
+}

@@ -35,13 +35,13 @@ export class SearchComponent implements OnDestroy {
     private indexService: IndexService,
     private suggestionsService: SuggestionsService
   ) { 
-    this.searchQueryChanged.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$)
-    ).subscribe(query => {
-      this.updateWidgetVisibility(query);
-    })
+    // this.searchQueryChanged.pipe(
+    //   debounceTime(300),
+    //   distinctUntilChanged(),
+    //   takeUntil(this.destroy$)
+    // ).subscribe(query => {
+    //   this.updateWidgetVisibility(query);
+    // })
   }
 
   ngOnDestroy(): void {
@@ -58,7 +58,7 @@ export class SearchComponent implements OnDestroy {
     const lowerQuery = query.toLowerCase();
     this.showTestWidget = lowerQuery.includes('test');
     this.showCalculatorWidget = lowerQuery.includes('calculator');
-    this.showPythonWidget = lowerQuery.includes('python');
+    this.showPythonWidget = lowerQuery.includes('py');
   }
 
   onSearch(): void {
