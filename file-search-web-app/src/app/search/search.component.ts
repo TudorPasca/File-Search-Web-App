@@ -1,28 +1,65 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { FileDTO, SearchService } from '../search.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IndexService } from '../index.service';
 import { SuggestionsService } from '../suggestions.service';
+import { TestWidgetComponent } from '../widget/test-widget/test-widget.component';
+import { PythonWidgetComponent } from '../widget/python-widget/python-widget.component';
+import { CalculatorWidgetComponent } from '../widget/calculator-widget/calculator-widget.component';
+import { Subject } from 'rxjs/internal/Subject';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-search',
-  imports: [ FormsModule, CommonModule ],
+  imports: [ FormsModule, CommonModule, TestWidgetComponent, PythonWidgetComponent, CalculatorWidgetComponent ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
-export class SearchComponent {
+export class SearchComponent implements OnDestroy {
   searchQuery: string = '';
   pathToIndex: string = '';
   files: FileDTO[] = [];
   suggestions: string[] = [];
   userMessage: string = '';
 
+  showTestWidget: boolean = false;
+  showCalculatorWidget: boolean = false;
+  showPythonWidget: boolean = false;
+
+  private searchQueryChanged = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
   constructor(
     private searchService: SearchService,
     private indexService: IndexService,
     private suggestionsService: SuggestionsService
-  ) { }
+  ) { 
+    this.searchQueryChanged.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(query => {
+      this.updateWidgetVisibility(query);
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onSearchQueryChange(query: string): void {
+    this.searchQuery = query;
+    this.searchQueryChanged.next(query);
+  }
+
+  updateWidgetVisibility(query: string): void {
+    const lowerQuery = query.toLowerCase();
+    this.showTestWidget = lowerQuery.includes('test');
+    this.showCalculatorWidget = lowerQuery.includes('calculator');
+    this.showPythonWidget = lowerQuery.includes('python');
+  }
 
   onSearch(): void {
     this.userMessage = '';
@@ -30,9 +67,13 @@ export class SearchComponent {
     this.suggestions = [];
 
     const query = this.searchQuery.trim();
+    this.updateWidgetVisibility(query);
 
     if (!query) {
       this.userMessage = 'Search query cannot be empty.';
+      this.showTestWidget = false;
+      this.showCalculatorWidget = false;
+      this.showPythonWidget = false;
       return;
     }
 

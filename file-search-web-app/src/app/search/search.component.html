@@ -1,13 +1,20 @@
 <div class="action-containers">
     <div class="search-container">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Enter search query" />
+        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchQueryChange($event)"
+            placeholder="Enter search query" />
         <button (click)="onSearch()">Search</button>
     </div>
-    
+
     <div class="index-container">
         <input type="text" [(ngModel)]="pathToIndex" placeholder="Enter path to index" />
         <button (click)="onIndexFiles()">Start Indexing</button>
     </div>
+</div>
+
+<div class="widgets-container">
+    <app-test-widget *ngIf="showTestWidget"></app-test-widget>
+    <app-calculator-widget *ngIf="showCalculatorWidget"></app-calculator-widget>
+    <app-python-widget *ngIf="showPythonWidget"></app-python-widget>
 </div>
 
 <div *ngIf="userMessage" class="error"> {{ userMessage }}
@@ -37,7 +44,8 @@
         <tr *ngFor="let file of files">
             <td>{{ file.name }}</td>
             <td>{{ file.path }}</td>
-            <td [title]="file.content">{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content }}</td>
+            <td [title]="file.content">{{ file.content.length > 30 ? (file.content | slice:0:30) + '...' : file.content
+                }}</td>
             <td>{{ file.score }}</td>
             <!-- <td>{{ file.is_folder ? 'Yes' : 'No' }}</td> -->
         </tr>
