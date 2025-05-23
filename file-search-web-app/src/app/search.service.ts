@@ -10,6 +10,21 @@ export interface FileDTO {
   score: number;
 }
 
+export interface FileTypeSummary {
+  extension: string;
+  count: number;
+}
+
+export interface SummariesData {
+  fileTypes: FileTypeSummary[];
+  averageFileSize: number;
+}
+
+export interface SearchResponse {
+  results: FileDTO[];
+  summaries: SummariesData;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,8 +33,8 @@ export class SearchService {
 
   constructor(private http: HttpClient) { }
 
-  searchFiles(query: string): Observable<FileDTO[]> {
-    return this.http.get<{ results: FileDTO[] }>(`${this.apiUrl}?q=${query}`)
-      .pipe(map(response => response.results));
+  searchFiles(query: string): Observable<SearchResponse> {
+    return this.http.get<SearchResponse>(`${this.apiUrl}?q=${query}`);
   }
 }
+

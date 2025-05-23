@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
-import { FileDTO, SearchService } from '../search.service';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { FileDTO, SearchResponse, SearchService, SummariesData } from '../search.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IndexService } from '../index.service';
@@ -16,13 +16,13 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
-export class SearchComponent implements OnDestroy {
+export class SearchComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
   pathToIndex: string = '';
   files: FileDTO[] = [];
   suggestions: string[] = [];
   userMessage: string = '';
-
+  searchSummaries: SummariesData | null = null;
   showTestWidget: boolean = false;
   showCalculatorWidget: boolean = false;
   showPythonWidget: boolean = false;
@@ -34,14 +34,16 @@ export class SearchComponent implements OnDestroy {
     private searchService: SearchService,
     private indexService: IndexService,
     private suggestionsService: SuggestionsService
-  ) { 
-    // this.searchQueryChanged.pipe(
-    //   debounceTime(300),
-    //   distinctUntilChanged(),
-    //   takeUntil(this.destroy$)
-    // ).subscribe(query => {
-    //   this.updateWidgetVisibility(query);
-    // })
+  ) { }
+
+  ngOnInit(): void {
+    this.searchQueryChanged.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(query => {
+      this.updateWidgetVisibility(query);
+    });
   }
 
   ngOnDestroy(): void {
@@ -55,7 +57,7 @@ export class SearchComponent implements OnDestroy {
   }
 
   updateWidgetVisibility(query: string): void {
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = query.toLowerCase().trim();
     this.showTestWidget = lowerQuery.includes('test');
     this.showCalculatorWidget = lowerQuery.includes('calculator');
     this.showPythonWidget = lowerQuery.includes('py');
@@ -65,7 +67,8 @@ export class SearchComponent implements OnDestroy {
     this.userMessage = '';
     this.files = [];
     this.suggestions = [];
-
+    this.searchSummaries = null;
+    
     const query = this.searchQuery.trim();
     this.updateWidgetVisibility(query);
 
@@ -78,7 +81,7 @@ export class SearchComponent implements OnDestroy {
     }
 
     this.searchService.searchFiles(query).subscribe({
-      next: (data) => this.handleSearchResponse(data),
+      next: (response: SearchResponse) => this.handleSearchResponse(response),
       error: (err) => this.handleError(err, "SEARCH"),
     });
 
@@ -91,13 +94,15 @@ export class SearchComponent implements OnDestroy {
     });
   }
 
-  private handleSearchResponse(data: FileDTO[]): void {
-    this.files = data;
+  private handleSearchResponse(response: SearchResponse): void {
+    this.files = response.results;
+    this.searchSummaries = response.summaries;
+
     console.log('Files received:', this.files);
-    if (this.files.length === 0) {
-      if (!this.userMessage) {
-         this.userMessage = "Search complete. No files found matching your query.";
-      }
+    console.log('Summaries received:', this.searchSummaries);
+
+    if (this.files.length === 0 && !this.userMessage) {
+        this.userMessage = "Search complete. No files found matching your query.";
     }
   }
 
@@ -106,6 +111,7 @@ export class SearchComponent implements OnDestroy {
     console.error(`${operation} error:`, error);
     if (operation === 'SEARCH') {
       this.files = [];
+      this.searchSummaries = null;
     } else if (operation === 'SUGGESTIONS') {
       this.suggestions = [];
     }
@@ -131,5 +137,14 @@ export class SearchComponent implements OnDestroy {
   private handleIndexResponse() {
     this.userMessage = 'Indexing request completed successfully.';
     console.log('Indexing successful');
+  }
+
+  formatBytes(bytes: number, decimals = 2): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 }

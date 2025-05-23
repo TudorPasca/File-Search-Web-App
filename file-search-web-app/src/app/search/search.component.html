@@ -31,6 +31,23 @@
     <h3>No Suggestions</h3>
 </ng-template>
 
+<div *ngIf="searchSummaries && files.length > 0" class="search-summaries-container">
+  <h3>Search Summary</h3>
+  <div class="summary-details">
+    <div *ngIf="searchSummaries.averageFileSize > 0" class="summary-item">
+      <strong>Average File Size:</strong> {{ formatBytes(searchSummaries.averageFileSize) }}
+    </div>
+    <div *ngIf="searchSummaries.fileTypes && searchSummaries.fileTypes.length > 0" class="summary-item">
+      <strong>File Types:</strong>
+      <ul class="file-type-list">
+        <li *ngFor="let fileType of searchSummaries.fileTypes">
+          {{ fileType.extension | uppercase }}: {{ fileType.count }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <table *ngIf="files.length > 0" class="file-table">
     <thead>
         <tr>
